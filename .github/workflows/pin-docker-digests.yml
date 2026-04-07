@@ -35,7 +35,20 @@ jobs:
           chmod +x ./fix-version.sh
           ./fix-version.sh Dockerfile
 
+      - name: Check if Dockerfile changed
+        id: dockerfile
+        run: |
+          if git diff --quiet -- Dockerfile; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No digest changes; skipping pull request."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Dockerfile changed; will open or update pull request."
+            git diff -- Dockerfile
+          fi
+
       - name: Create pull request
+        if: steps.dockerfile.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "chore(docker): pin base image digests"
