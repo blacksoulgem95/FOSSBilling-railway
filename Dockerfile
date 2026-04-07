@@ -108,7 +108,7 @@ EOF
 RUN cat <<'EOF' > /entrypoint.sh
 #!/bin/sh
 # Se /app è vuota (volume Railway montato), copia i file da /fossbilling-src
-if [ -z "$(ls -A /app 2>/dev/null)" ]; then
+if [ ! -f /app/index.php ]; then
     echo "Populating /app from /fossbilling-src..."
     cp -a /fossbilling-src/. /app/
 fi
