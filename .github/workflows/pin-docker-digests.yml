@@ -1,3 +1,11 @@
+# Requires GITHUB_TOKEN to open PRs. Configure the repository (and org, if applicable):
+#
+# Repository: Settings → Actions → General
+#   - Workflow permissions: "Read and write permissions"
+#   - Enable: "Allow GitHub Actions to create and approve pull requests"
+#
+# Organization (if the repo is under an org): Org Settings → Actions → General
+#   - Allow the same workflow permissions / PR creation policy for member repositories.
 name: Pin Docker base image digests
 
 on:

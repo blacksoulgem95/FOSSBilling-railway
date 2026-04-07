@@ -40,6 +40,10 @@ Use this path if you are not using the template button (for example your own for
 - **On Railway:** push changes to the connected branch, or trigger a **Redeploy** from the service dashboard to rebuild from the latest commit.
 - **Locally:** `git pull` in your clone of this repo, then push if Railway is connected to your fork.
 
+### GitHub Actions (digest pinning PRs)
+
+The workflow **Pin Docker base image digests** uses the default `GITHUB_TOKEN` to open pull requests. In the repository **Settings → Actions → General**, set **Workflow permissions** to **Read and write permissions** and turn on **Allow GitHub Actions to create and approve pull requests**. If this repo lives under an organization, an org owner may need to allow the same under **Organization settings → Actions → General**.
+
 ## Security
 
 Worker processes run as an unprivileged user (`appuser`, uid 1001):
