@@ -6,7 +6,7 @@ FROM php:8.5-fpm
 
 # Installa Nginx, cron, supervisor e libcap2-bin (per setcap)
 RUN apt-get update && apt-get install -y \
-    nginx cron supervisor vim less libcap2-bin \
+    nginx cron supervisor vim less libcap2-bin gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
 # Crea utente non root 1001
@@ -31,11 +31,12 @@ RUN mkdir -p /var/log/nginx /var/lib/nginx/body \
 RUN echo "*/5 * * * * appuser php /app/cron.php >> /app/cron.log 2>&1" > /etc/cron.d/fossbilling \
     && chmod 0644 /etc/cron.d/fossbilling
 
-# Configura nginx
-RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf && \
-    cat <<'EOF' > /etc/nginx/sites-enabled/fossbilling.conf
+# Configura nginx (template con ${PORT} per Railway)
+RUN rm -f /etc/nginx/sites-enabled/* /etc/nginx/conf.d/* && \
+    mkdir -p /etc/nginx/templates && \
+    cat <<'EOF' > /etc/nginx/templates/fossbilling.conf.template
 server {
-    listen 80;
+    listen ${PORT};
     server_name _;
 
     root /app;
@@ -100,7 +101,16 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 EOF
 
-# Espone porta HTTP
-EXPOSE 80
+# Entrypoint: sostituisce ${PORT} nel template nginx e avvia supervisord
+RUN cat <<'EOF' > /entrypoint.sh
+#!/bin/sh
+PORT=${PORT:-8080}
+export PORT
+envsubst '${PORT}' < /etc/nginx/templates/fossbilling.conf.template > /etc/nginx/sites-enabled/fossbilling.conf
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+EOF
+RUN chmod +x /entrypoint.sh
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+EXPOSE 8080
+
+CMD ["/entrypoint.sh"]
