@@ -110,7 +110,10 @@ RUN cat <<'EOF' > /entrypoint.sh
 # Se /app è vuota (volume Railway montato), copia i file da /fossbilling-src
 if [ ! -f /app/index.php ]; then
     echo "Populating /app from /fossbilling-src..."
-    cp -a /fossbilling-src/. /app/
+    cp -a /fossbilling-src/. /app/ && echo "Copy done." || echo "ERROR: copy failed!"
+    chown -R 1001:1001 /app
+    chmod -R 755 /app
+    echo "index.php present: $(test -f /app/index.php && echo yes || echo NO)"
 fi
 
 PORT=${PORT:-8080}
