@@ -14,13 +14,31 @@ A Railway-optimised Docker image for [FOSSBilling](https://fossbilling.org/), bu
 
 ## Deploy on Railway
 
+Click the button below to deploy in one click:
+
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/fossbilling?referralCode=YljGzR&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
+### One-click (Railway template)
+
+1. Click **Deploy on Railway** and sign in.
+2. Confirm the new project. The template ships with **MySQL** already provisioned and connected — you do not need to add a database service yourself.
+3. Wait for the Docker build and deploy to finish.
+4. Open your service’s public URL and complete the [FOSSBilling](https://fossbilling.org/) setup wizard. Use the database host, name, user, and password from your Railway **MySQL** service (or the variables the template exposes to the app).
+
+### Deploy from this Git repository
+
+Use this path if you are not using the template button (for example your own fork):
+
 1. Fork or clone this repository.
-2. Create a new Railway project and point it at this repo.
-3. Add a MySQL or MariaDB service to the project and link it.
-4. Railway will build and deploy the image automatically. The app will be available on port `80`.
-5. Visit your Railway URL to complete the FOSSBilling setup wizard.
+2. In Railway: **New project** → **Deploy from GitHub** (or Git provider) and select this repo.
+3. Add a **MySQL** or **MariaDB** service, link it to the web service, and configure credentials / env vars so FOSSBilling can connect (see the [FOSSBilling documentation](https://fossbilling.org/docs)).
+4. Deploy. Railway sets **`PORT`** automatically; Nginx listens on that port inside the container.
+5. Open your app URL and run the FOSSBilling setup wizard.
+
+### Updating
+
+- **On Railway:** push changes to the connected branch, or trigger a **Redeploy** from the service dashboard to rebuild from the latest commit.
+- **Locally:** `git pull` in your clone of this repo, then push if Railway is connected to your fork.
 
 ## Security
 
