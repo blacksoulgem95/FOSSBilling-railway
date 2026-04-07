@@ -14,6 +14,8 @@ A Railway-optimised Docker image for [FOSSBilling](https://fossbilling.org/), bu
 
 ## Deploy on Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/o_VIwH?referralCode=YljGzR&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 1. Fork or clone this repository.
 2. Create a new Railway project and point it at this repo.
 3. Add a MySQL or MariaDB service to the project and link it.
