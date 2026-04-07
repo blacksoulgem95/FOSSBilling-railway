@@ -2,7 +2,7 @@
 FROM fossbilling/fossbilling:latest AS foss
 
 # Stage 2: PHP-FPM + Nginx + cron + supervisor
-FROM php:8.5-fpm
+FROM php:8.4-fpm
 
 # Installa Nginx, cron, supervisor e libcap2-bin (per setcap)
 RUN apt-get update && apt-get install -y \
@@ -14,9 +14,15 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     default-libmysqlclient-dev \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev \
+    libxpm-dev libavif-dev \
     libbz2-dev \
     libmagickwand-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+        --with-xpm \
+        --with-avif \
     && docker-php-ext-install intl pdo_mysql gd bz2 \
     && pecl install imagick \
     && docker-php-ext-enable imagick \
