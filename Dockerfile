@@ -9,6 +9,19 @@ RUN apt-get update && apt-get install -y \
     nginx cron supervisor vim less libcap2-bin gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
+# Estensioni PHP: intl, pdo_mysql, gd, bz2, imagick
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    default-libmysqlclient-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev \
+    libbz2-dev \
+    libmagickwand-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install intl pdo_mysql gd bz2 \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -rf /var/lib/apt/lists/*
+
 # Crea utente non root 1001
 RUN groupadd -g 1001 appuser && useradd -u 1001 -g 1001 -m appuser
 
