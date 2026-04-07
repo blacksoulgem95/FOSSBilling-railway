@@ -63,15 +63,50 @@ server {
 
     root /app;
     index index.php index.html;
+    sendfile off;
 
-    location / {
-        try_files $uri $uri/ /index.php?$args;
+    # Block config at exact URI so try_files cannot serve it as a static (non-PHP) file
+    location = /config.php {
+        return 404;
+    }
+    location = /config-sample.php {
+        return 404;
     }
 
-    location ~ \.php$ {
+    # FOSSBilling expects clean URLs via ?_url= (see official NGINX examples)
+    location ~* \.(ini|sh|inc|bak|twig|sql)$ {
+        return 404;
+    }
+    location ~ /\.(?!well-known/) {
+        return 404;
+    }
+    location ^~ /vendor/ {
+        return 404;
+    }
+    location ~* /uploads/.*\.php$ {
+        return 404;
+    }
+    location ~* /data/(?!(assets/gateways/)) {
+        return 404;
+    }
+
+    location / {
+        try_files $uri $uri/ @fossbilling_rewrite;
+    }
+
+    # Internal router: pass path to index.php as _url (FOSSBilling front controller)
+    location @fossbilling_rewrite {
+        rewrite ^/page/(.*)$ /index.php?_url=/custompages/$1;
+        rewrite ^/(.*)$ /index.php?_url=/$1;
+    }
+
+    location ~ \.php {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
         include fastcgi_params;
         fastcgi_pass 127.0.0.1:9000;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
         fastcgi_index index.php;
     }
 
