@@ -15,12 +15,15 @@ RUN groupadd -g 1001 appuser && useradd -u 1001 -g 1001 -m appuser
 # Permetti a nginx di bindare porte privilegiate senza root
 RUN setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
 
-# Copia FossBilling
-COPY --from=foss /var/www/html /app
+# Copia FossBilling in directory intermedia (Railway monta /app come volume)
+COPY --from=foss /var/www/html /fossbilling-src
 
 # Permessi per utente non root
-RUN chown -R 1001:1001 /app \
-    && chmod -R 755 /app
+RUN chown -R 1001:1001 /fossbilling-src \
+    && chmod -R 755 /fossbilling-src
+
+# Crea /app vuota (verrà popolata dall'entrypoint se Railway monta un volume)
+RUN mkdir -p /app && chown 1001:1001 /app
 
 # Directory runtime per nginx (writable da worker appuser)
 RUN mkdir -p /var/log/nginx /var/lib/nginx/body \
@@ -104,6 +107,12 @@ EOF
 # Entrypoint: sostituisce ${PORT} nel template nginx e avvia supervisord
 RUN cat <<'EOF' > /entrypoint.sh
 #!/bin/sh
+# Se /app è vuota (volume Railway montato), copia i file da /fossbilling-src
+if [ -z "$(ls -A /app 2>/dev/null)" ]; then
+    echo "Populating /app from /fossbilling-src..."
+    cp -a /fossbilling-src/. /app/
+fi
+
 PORT=${PORT:-8080}
 export PORT
 envsubst '${PORT}' < /etc/nginx/templates/fossbilling.conf.template > /etc/nginx/sites-enabled/fossbilling.conf
