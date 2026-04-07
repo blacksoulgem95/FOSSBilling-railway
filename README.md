@@ -7,7 +7,7 @@ A Railway-optimised Docker image for [FOSSBilling](https://fossbilling.org/), bu
 | Component | Details |
 |-----------|---------|
 | FOSSBilling | Latest (`fossbilling/fossbilling`) |
-| PHP | 8.5-FPM |
+| PHP | 8.4-FPM |
 | Web server | Nginx |
 | Process manager | Supervisor |
 | Cron | System cron, runs `cron.php` every 5 minutes |
