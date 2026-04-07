@@ -1,22 +1,30 @@
-# Stage 1: immagine ufficiale FossBilling
+# Stage 1: copia FossBilling
 FROM fossbilling/fossbilling:latest AS foss
 
-FROM php:8.5-fpm
+# Stage 2: Nginx + PHP-FPM
+FROM bitnami/nginx-php-fpm:latest
 
-# Installa cron e utilities base nello stage finale
-RUN apt-get update && apt-get install -y cron vim less && rm -rf /var/lib/apt/lists/*
+# Installa cron
+USER root
+RUN install_packages cron
 
-# Copia tutto da /var/www/html dell'immagine FossBilling
-COPY --from=fossbilling/fossbilling:latest /var/www/html /var/www/html
+# Copia FossBilling
+COPY --from=foss /var/www/html /app
 
-# Permessi corretti
-RUN chown -R www-data:www-data /var/www/html
+# Imposta permessi sicuri per utente non root
+RUN chown -R 1001:1001 /app \
+    && chmod -R 755 /app
 
-# Imposta cron
-RUN echo '*/5 * * * * /usr/local/bin/php /var/www/html/cron.php >> /var/log/cron.log 2>&1' \
-    > /tmp/www-data.cron && crontab -u www-data /tmp/www-data.cron
+# Configura cron per l'utente non root
+RUN echo "*/5 * * * * php /app/cron.php >> /app/cron.log 2>&1" > /etc/cron.d/fossbilling \
+    && chmod 0644 /etc/cron.d/fossbilling \
+    && crontab -u 1001 /etc/cron.d/fossbilling
 
-# Espone porta FPM
-EXPOSE 9000
+# Espone porta HTTP
+EXPOSE 80
 
-CMD ["php-fpm"]
+# Passa a utente non root
+USER 1001
+
+# Avvia cron + Nginx + PHP-FPM
+CMD ["sh", "-c", "cron && nami start --foreground nginx-php-fpm"]
