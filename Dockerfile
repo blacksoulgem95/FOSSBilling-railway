@@ -1,6 +1,10 @@
 # Stage 1: immagine ufficiale FossBilling
 FROM fossbilling/fossbilling:latest AS foss
 
+# Installa cron e utilities base
+RUN apt-get update && apt-get install -y cron vim less && rm -rf /var/lib/apt/lists/*
+
+
 # Stage 2: nostra immagine Railway / PHP-FPM
 FROM php:8.5-fpm
 
