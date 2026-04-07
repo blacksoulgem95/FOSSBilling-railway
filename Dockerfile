@@ -4,8 +4,8 @@ FROM fossbilling/fossbilling:latest
 RUN a2dismod mpm_worker mpm_event mpm_prefork 2>/dev/null || true
 
 # Rimuovi i file di configurazione Apache che caricano i moduli MPM
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load && \
-    rm -f /etc/apache2/mods-available/mpm_*.load
+RUN rm -f /etc/apache2/mods-enabled/mpm_* && \
+    rm -f /etc/apache2/mods-available/mpm_*
 
 
 # Reindirizza i log di Apache a stdout/stderr per Railway
