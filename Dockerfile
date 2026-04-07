@@ -1,8 +1,8 @@
 # Stage 1: copia FossBilling
-FROM fossbilling/fossbilling:latest AS foss
+FROM fossbilling/fossbilling:latest@sha256:6bad10f60c9a49360e2c63d63027827bf72c6abcbd3a06e0faf93506377f75c3 AS foss
 
 # Stage 2: PHP-FPM + Nginx + cron + supervisor
-FROM php:8.4-fpm
+FROM php:8.4-fpm@sha256:888e807b1de2fc32ff430ede9ab64755a72a4bd99c80e7962d3b5fa4a84cd1d5
 
 # Installa Nginx, cron, supervisor e libcap2-bin (per setcap)
 RUN apt-get update && apt-get install -y \

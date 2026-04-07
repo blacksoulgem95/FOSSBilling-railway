@@ -1,0 +1,48 @@
+name: Pin Docker base image digests
+
+on:
+  schedule:
+    # Mondays 07:00 UTC
+    - cron: "0 7 * * 1"
+  # Manual: repo → Actions → this workflow → "Run workflow"
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "Optional note for this run (logged in the job output)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pin-digests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Manual run metadata
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Triggered manually by ${GITHUB_ACTOR}"
+          echo "Note: ${{ inputs.note }}"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Pin image digests in Dockerfile
+        run: |
+          chmod +x ./fix-version.sh
+          ./fix-version.sh Dockerfile
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(docker): pin base image digests"
+          title: "chore(docker): pin base image digests"
+          body: |
+            Weekly (or manual) update of `FROM` lines to `image:tag@sha256:…` via `fix-version.sh`.
+
+            Review the digest changes and merge when ready.
+          branch: chore/docker-digest-pins
+          delete-branch: true
