@@ -32,10 +32,10 @@ RUN echo "*/5 * * * * appuser php /app/cron.php >> /app/cron.log 2>&1" > /etc/cr
     && chmod 0644 /etc/cron.d/fossbilling
 
 # Configura nginx
-RUN rm /etc/nginx/sites-enabled/default && \
-    cat <<'EOF' > /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf && \
+    cat <<'EOF' > /etc/nginx/sites-enabled/fossbilling.conf
 server {
-    listen 80;
+    listen 80 default_server;
     server_name _;
 
     root /app;
@@ -103,4 +103,4 @@ EOF
 # Espone porta HTTP
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
