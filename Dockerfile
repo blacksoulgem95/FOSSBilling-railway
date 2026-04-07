@@ -35,7 +35,7 @@ RUN echo "*/5 * * * * appuser php /app/cron.php >> /app/cron.log 2>&1" > /etc/cr
 RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/conf.d/default.conf && \
     cat <<'EOF' > /etc/nginx/sites-enabled/fossbilling.conf
 server {
-    listen 80 default_server;
+    listen 80;
     server_name _;
 
     root /app;
