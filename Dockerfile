@@ -134,6 +134,12 @@ RUN sed -i 's/user www-data;/user appuser;/' /etc/nginx/nginx.conf || true && \
 RUN sed -i 's/user = www-data/user = appuser/' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's/group = www-data/group = appuser/' /usr/local/etc/php-fpm.d/www.conf
 
+# Log errori PHP nel path usato da FOSSBilling (stesso file inoltrato a stdout per Railway)
+RUN printf '%s\n' \
+    'error_log = /app/data/log/php_error.log' \
+    'log_errors = On' \
+    > /usr/local/etc/php/conf.d/fossbilling-errorlog.ini
+
 # Configurazione supervisord
 RUN mkdir -p /var/log/supervisor && \
     cat <<'EOF' > /etc/supervisor/conf.d/supervisord.conf
@@ -167,6 +173,18 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
+
+; Stream FOSSBilling PHP error log to container stdout (Railway / monitoring)
+[program:php-error-log]
+command=/bin/sh -c "mkdir -p /app/data/logs; : >> /app/data/logs/php_error.log; exec tail -n0 -F /app/data/log/php_error.log"
+user=appuser
+autostart=true
+autorestart=true
+startretries=10
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 EOF
 
 # Entrypoint: sostituisce ${PORT} nel template nginx e avvia supervisord
@@ -180,6 +198,10 @@ if [ ! -f /app/index.php ]; then
     chmod -R 755 /app
     echo "index.php present: $(test -f /app/index.php && echo yes || echo NO)"
 fi
+
+mkdir -p /app/data/log
+touch /app/data/log/php_error.log
+chown 1001:1001 /app/data/log /app/data/log/php_error.log 2>/dev/null || true
 
 PORT=${PORT:-8080}
 export PORT

@@ -12,6 +12,7 @@ A Railway-optimised Docker image for [FOSSBilling](https://fossbilling.org/), bu
 | Web server | Nginx |
 | Process manager | Supervisor |
 | Cron | System cron, runs `cron.php` every 5 minutes |
+| Log PHP (monitoring) | `php_error.log` → `/app/data/logs/php_error.log`, inoltrato su **stdout** del container (visibile nei log Railway) |
 
 ## Deploy on Railway
 
