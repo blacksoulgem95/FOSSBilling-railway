@@ -7,6 +7,7 @@ A Railway-optimised Docker image for [FOSSBilling](https://fossbilling.org/), bu
 | Component | Details |
 |-----------|---------|
 | FOSSBilling | Latest (`fossbilling/fossbilling`) |
+| Domini | [OpenProvider registrar](https://github.com/vicedomini-softworks/fossbilling-registrar-openprovider) (abilita in **System → Domain registration**) |
 | PHP | 8.4-FPM |
 | Web server | Nginx |
 | Process manager | Supervisor |

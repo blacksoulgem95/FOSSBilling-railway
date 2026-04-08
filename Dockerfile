@@ -37,6 +37,17 @@ RUN setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
 # Copia FossBilling in directory intermedia (Railway monta /app come volume)
 COPY --from=foss /var/www/html /fossbilling-src
 
+# Registrar OpenProvider (domini) — https://github.com/vicedomini-softworks/fossbilling-registrar-openprovider
+ARG OPENPROVIDER_REF=main
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && git clone --depth 1 --branch "${OPENPROVIDER_REF}" \
+        https://github.com/vicedomini-softworks/fossbilling-registrar-openprovider.git /tmp/openprovider \
+    && cp -a /tmp/openprovider/library/Registrar/Adapter/OpenProvider.php \
+        /fossbilling-src/library/Registrar/Adapter/ \
+    && rm -rf /tmp/openprovider \
+    && apt-get purge -y --auto-remove git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Permessi per utente non root
 RUN chown -R 1001:1001 /fossbilling-src \
     && chmod -R 755 /fossbilling-src
