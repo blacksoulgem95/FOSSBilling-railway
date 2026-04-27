@@ -2,7 +2,7 @@
 FROM fossbilling/fossbilling:latest@sha256:6bad10f60c9a49360e2c63d63027827bf72c6abcbd3a06e0faf93506377f75c3 AS foss
 
 # Stage 2: PHP-FPM + Nginx + cron + supervisor
-FROM php:8.4-fpm@sha256:d31cf114d43fee26655a76b0d09dddeaab3f09391eb4edf3f35e1f1c919e1b28
+FROM php:8.4-fpm@sha256:eec2a132b91271dcf51e86119311ec4b22105736af704997a690594b8f88af31
 
 # Installa Nginx, cron, supervisor e libcap2-bin (per setcap)
 RUN apt-get update && apt-get install -y \
